@@ -18,7 +18,7 @@ public class FileEntity {
     private Long id;
     private String fileName;
 
-    @ElementCollection
-    @Column(name = "line_content", columnDefinition = "TEXT")
-    private List<String> lines;
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String content;
 }

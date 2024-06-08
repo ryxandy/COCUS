@@ -18,7 +18,8 @@ public class FileService {
     public FileEntity saveFile(String fileName, List<String> lines) {
         FileEntity fileEntity = new FileEntity();
         fileEntity.setFileName(fileName);
-        fileEntity.setLines(lines);
+        String content = String.join("\n", lines); // Juntar as linhas com delimitador de nova linha
+        fileEntity.setContent(content);
         return fileRepository.save(fileEntity);
     }
 
