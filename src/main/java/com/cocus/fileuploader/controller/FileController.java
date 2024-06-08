@@ -35,4 +35,5 @@ public class FileController {
     public Object getRandomLine(@PathVariable Long fileId, @RequestHeader("Accept") String acceptHeader) {
         return fileService.getRandomLine(fileId, acceptHeader);
     }
+
 }

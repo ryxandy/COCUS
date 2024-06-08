@@ -2,15 +2,16 @@ package com.cocus.fileuploader.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class LineResponse {
-
+public class RandomLineDetailsResponse {
+    private int lineNumber;
+    private String fileName;
     private String line;
+    private char mostFrequentChar;
 
 }
+
