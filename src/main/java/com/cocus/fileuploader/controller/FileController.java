@@ -3,10 +3,8 @@ package com.cocus.fileuploader.controller;
 
 import com.cocus.fileuploader.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
@@ -31,5 +29,10 @@ public class FileController {
                 .collect(Collectors.toList());
         fileService.saveFile(file.getOriginalFilename(), lines);
         return "File uploaded successfully: " + file.getOriginalFilename();
+    }
+
+    @GetMapping(value = "/random-line/{fileId}", produces = {MediaType.TEXT_PLAIN_VALUE, MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public Object getRandomLine(@PathVariable Long fileId, @RequestHeader("Accept") String acceptHeader) {
+        return fileService.getRandomLine(fileId, acceptHeader);
     }
 }
