@@ -19,5 +19,6 @@ public class FileEntity {
     private String fileName;
 
     @ElementCollection
+    @Column(name = "line_content")
     private List<String> lines;
 }
