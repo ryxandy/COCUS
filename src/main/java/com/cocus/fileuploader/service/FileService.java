@@ -3,13 +3,12 @@ package com.cocus.fileuploader.service;
 import com.cocus.fileuploader.model.FileEntity;
 import com.cocus.fileuploader.repository.FileRepository;
 import com.cocus.fileuploader.util.RandomLineDetailsResponse;
+import com.cocus.fileuploader.util.SimpleLineResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class FileService {
@@ -33,11 +32,16 @@ public class FileService {
             Random random = new Random();
             int index = random.nextInt(lines.size());
             String randomLine = lines.get(index);
-            char mostFrequentChar = getMostFrequentChar(randomLine);
 
-            if (acceptHeader != null && acceptHeader.startsWith("application/")) {
+            if (acceptHeader != null && acceptHeader.equals(MediaType.APPLICATION_JSON_VALUE)) {
+                // Retorna a linha em um formato JSON adequado
+                return new SimpleLineResponse(randomLine);
+            } else if (acceptHeader != null && acceptHeader.startsWith("application/")) {
+                // Retorna detalhes completos para outros tipos dentro de application/*
+                char mostFrequentChar = getMostFrequentChar(randomLine);
                 return new RandomLineDetailsResponse(index + 1, file.get().getFileName(), randomLine, mostFrequentChar);
             } else {
+                // Retorna a linha como texto plano para outros cabeçalhos ou falta de cabeçalho
                 return randomLine;
             }
         }
@@ -45,18 +49,19 @@ public class FileService {
     }
 
     private char getMostFrequentChar(String line) {
-        int[] counts = new int[256]; // Basic ASCII character set
+        Map<Character, Integer> counts = new HashMap<>();
         for (char c : line.toCharArray()) {
-            counts[c]++;
+            counts.put(c, counts.getOrDefault(c, 0) + 1);
         }
         int max = 0;
         char result = ' ';
-        for (int i = 0; i < counts.length; i++) {
-            if (counts[i] > max) {
-                max = counts[i];
-                result = (char) i;
+        for (Map.Entry<Character, Integer> entry : counts.entrySet()) {
+            if (entry.getValue() > max) {
+                max = entry.getValue();
+                result = entry.getKey();
             }
         }
         return result;
     }
+
 }
