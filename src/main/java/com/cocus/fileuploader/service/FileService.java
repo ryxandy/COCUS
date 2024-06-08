@@ -48,6 +48,25 @@ public class FileService {
         return null;
     }
 
+    public String getRandomLineBackwardsFromAnyFile() {
+        List<FileEntity> files = fileRepository.findAll();
+        if (files.isEmpty()) {
+            return "No files available";
+        }
+        Random random = new Random();
+        // Selecionar um arquivo aleatoriamente de todos os arquivos disponíveis
+        FileEntity randomFile = files.get(random.nextInt(files.size()));
+        // Quebrar o conteúdo do arquivo em linhas
+        List<String> lines = Arrays.asList(randomFile.getContent().split("\n"));
+        if (lines.isEmpty()) {
+            return "The file is empty";
+        }
+        // Escolher uma linha aleatória
+        String randomLine = lines.get(random.nextInt(lines.size()));
+        // Retornar a linha ao contrário
+        return new StringBuilder(randomLine).reverse().toString();
+    }
+
     private char getMostFrequentChar(String line) {
         Map<Character, Integer> counts = new HashMap<>();
         for (char c : line.toCharArray()) {

@@ -36,4 +36,9 @@ public class FileController {
         return fileService.getRandomLine(fileId, acceptHeader);
     }
 
+    @GetMapping("/random-line-backwards")
+    public String getRandomLineBackwards() {
+        return fileService.getRandomLineBackwardsFromAnyFile();
+    }
+
 }
