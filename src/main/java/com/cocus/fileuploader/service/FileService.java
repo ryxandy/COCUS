@@ -19,12 +19,13 @@ public class FileService {
     private FileRepository fileRepository;
 
 
-    public void saveFile(String fileName, List<String> lines) {
+    public FileEntity saveFile(String fileName, List<String> lines) {
         FileEntity fileEntity = new FileEntity();
         fileEntity.setFileName(fileName);
         String content = String.join("\n", lines); // Juntar as linhas com delimitador de nova linha
         fileEntity.setContent(content);
         fileRepository.save(fileEntity);
+        return fileEntity;
     }
 
     public Object getRandomLine(Long fileId, String acceptHeader) {
