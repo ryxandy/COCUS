@@ -41,4 +41,13 @@ public class FileController {
         return fileService.getRandomLineBackwardsFromAnyFile();
     }
 
+    @GetMapping("/longest-100-lines")
+    public List<String> getLongest100Lines() {
+        return fileService.getLongest100Lines();
+    }
+
+    @GetMapping("/longest-20-lines-of-one-file")
+    public List<String> get20LongestLinesOfFile(@RequestParam(required = false, defaultValue = "false") boolean latest) {
+        return fileService.get20LongestLinesOfFile(latest);
+    }
 }

@@ -2,6 +2,7 @@ package com.cocus.fileuploader.service;
 
 import com.cocus.fileuploader.model.FileEntity;
 import com.cocus.fileuploader.repository.FileRepository;
+import com.cocus.fileuploader.util.Operations;
 import com.cocus.fileuploader.util.RandomLineDetailsResponse;
 import com.cocus.fileuploader.util.SimpleLineResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FileService {
@@ -17,12 +19,12 @@ public class FileService {
     private FileRepository fileRepository;
 
 
-    public FileEntity saveFile(String fileName, List<String> lines) {
+    public void saveFile(String fileName, List<String> lines) {
         FileEntity fileEntity = new FileEntity();
         fileEntity.setFileName(fileName);
         String content = String.join("\n", lines); // Juntar as linhas com delimitador de nova linha
         fileEntity.setContent(content);
-        return fileRepository.save(fileEntity);
+        fileRepository.save(fileEntity);
     }
 
     public Object getRandomLine(Long fileId, String acceptHeader) {
@@ -38,10 +40,9 @@ public class FileService {
                 return new SimpleLineResponse(randomLine);
             } else if (acceptHeader != null && acceptHeader.startsWith("application/")) {
                 // Retorna detalhes completos para outros tipos dentro de application/*
-                char mostFrequentChar = getMostFrequentChar(randomLine);
+                char mostFrequentChar = Operations.getMostFrequentChar(randomLine);
                 return new RandomLineDetailsResponse(index + 1, file.get().getFileName(), randomLine, mostFrequentChar);
             } else {
-                // Retorna a linha como texto plano para outros cabeçalhos ou falta de cabeçalho
                 return randomLine;
             }
         }
@@ -67,20 +68,35 @@ public class FileService {
         return new StringBuilder(randomLine).reverse().toString();
     }
 
-    private char getMostFrequentChar(String line) {
-        Map<Character, Integer> counts = new HashMap<>();
-        for (char c : line.toCharArray()) {
-            counts.put(c, counts.getOrDefault(c, 0) + 1);
+    public List<String> getLongest100Lines() {
+        return fileRepository.findAll().stream()
+                .flatMap(file -> Arrays.stream(file.getContent().split("\n")))
+                .filter(line -> line != null && !line.isEmpty()) // Filtrar linhas vazias
+                .sorted((line1, line2) -> Integer.compare(line2.length(), line1.length())) // Ordenar por comprimento em ordem decrescente
+                .limit(100) // Limitar a 100 linhas
+                .collect(Collectors.toList());
+    }
+
+    public List<String> get20LongestLinesOfFile(boolean chooseLatest) {
+        FileEntity file;
+        if (chooseLatest) {
+            // Seleciona o arquivo mais recente
+            file = fileRepository.findTopByOrderByCreatedAtDesc();
+        } else {
+            // Seleciona um arquivo aleatoriamente
+            List<FileEntity> files = fileRepository.findAll();
+            file = files.isEmpty() ? null : files.get((int) (Math.random() * files.size()));
         }
-        int max = 0;
-        char result = ' ';
-        for (Map.Entry<Character, Integer> entry : counts.entrySet()) {
-            if (entry.getValue() > max) {
-                max = entry.getValue();
-                result = entry.getKey();
-            }
+
+        if (file == null) {
+            return List.of("No file available");
         }
-        return result;
+
+        return Arrays.stream(file.getContent().split("\n"))
+                .filter(line -> line != null && !line.isEmpty())
+                .sorted(Comparator.comparingInt(String::length).reversed())
+                .limit(20)
+                .collect(Collectors.toList());
     }
 
 }
