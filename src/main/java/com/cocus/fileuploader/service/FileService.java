@@ -5,8 +5,10 @@ import com.cocus.fileuploader.repository.FileRepository;
 import com.cocus.fileuploader.util.Operations;
 import com.cocus.fileuploader.util.RandomLineDetailsResponse;
 import com.cocus.fileuploader.util.SimpleLineResponse;
+import com.cocus.fileuploader.util.SimpleLineResponseXML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -39,10 +41,12 @@ public class FileService {
             if (acceptHeader != null && acceptHeader.equals(MediaType.APPLICATION_JSON_VALUE)) {
                 // Retorna a linha em um formato JSON adequado
                 return new SimpleLineResponse(randomLine);
-            } else if (acceptHeader != null && acceptHeader.startsWith("application/")) {
+            } else if (acceptHeader != null && acceptHeader.equals("application/*")) {
                 // Retorna detalhes completos para outros tipos dentro de application/*
                 char mostFrequentChar = Operations.getMostFrequentChar(randomLine);
                 return new RandomLineDetailsResponse(index + 1, file.get().getFileName(), randomLine, mostFrequentChar);
+            }else if (acceptHeader != null && acceptHeader.equals(MediaType.APPLICATION_XML_VALUE)) {
+                return ResponseEntity.ok().contentType(MediaType.APPLICATION_XML).body(new SimpleLineResponseXML(randomLine));
             } else {
                 return randomLine;
             }
