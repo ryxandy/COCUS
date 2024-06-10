@@ -1,4 +1,4 @@
-![Welcome](https://raw.githubusercontent.com/ryxandy/RestConsuming/master/rest.png)
+![Welcome](https://github.com/ryxandy/RestConsuming/blob/master/logo.png)
 #                                                                        Tour into this application 
 ###                                                             Overview, Technologies, Response Example.
 
